@@ -21,18 +21,32 @@ def validate_file(file_path):
         with open(file_path,'r',encoding='utf-8') as file:
             hosts=[host.strip() for host in file if host.strip()]
         if not hosts:
-            raise argparse.ArgumentTypeError(f"файл {file_path} пуст введите хотя бы один URL ")
+            print(f"файл {file_path} пуст введите хотя бы один URL ")
+            raise SystemExit(1)
         for host in hosts:
             if not URL_PATTERN.match(host):
-                raise argparse.ArgumentTypeError(
+                print(
                     f"Ошибка в файле {file_path}: неверный формат адреса {host}. "
                     f"Ожидается формат http://example.com или https://example.com"
                 )
+                raise SystemExit(1)
         return hosts
     except FileNotFoundError:
-        raise argparse.ArgumentTypeError(f"Файл {file_path} не найден.")
-    except IOError:
-        raise argparse.ArgumentTypeError(f"Ошибка чтения файла {file_path}")
+        print(f"Файл {file_path} не найден.")
+        raise SystemExit(1)
+    except IsADirectoryError:
+        print(f"Ошибка: путь {file_path} указывает на директорию, а не на файл.")
+        raise SystemExit(1)
+    except PermissionError:
+        print(f"Ошибка: у вас нет прав на чтение файла {file_path}.")
+        raise SystemExit(1)
+    except IOError as e:
+        print(f"Ошибка чтения файла {file_path}: {e}")
+        raise SystemExit(1)
+    except UnicodeDecodeError:
+        print(f"Ошибка при чтении файла {file_path}: неверная кодировка.")
+        raise SystemExit(1)
+   
     
 #создание парсера аргументов
 parser = argparse.ArgumentParser()
@@ -43,6 +57,27 @@ group.add_argument("-F","--file",help="Путь к файлу со списко�
 
 parser.add_argument("-C","--count",help = "введите количество запросов",required=False,type=int,default=1)
 
-args = parser.parse_args()
+parser.add_argument("-O","--output",help = "путь до файла куда нужно сохранить вывод",required=False)
 
-print(args.hosts if args.hosts else args.file, args.count)
+args = parser.parse_args()
+#выбор того куда выводить информацию 
+if not args.output:
+    print(args.hosts if args.hosts else args.file, args.count)
+else:
+    try:
+        with open(args.output,'w',encoding='utf-8') as file:
+            hosts = args.hosts if args.hosts else args.file, args.count
+            file.write(f"Хосты: {hosts}\nКоличество запросов: {args.count}\n")
+        print(f"Результат сохранен в файл: {args.output}")
+    except FileNotFoundError:
+        print(f"Ошибка: файл {args.output} не найден.")
+        raise SystemExit(1)
+    except IsADirectoryError:
+        print(f"Ошибка: путь {args.output} указывает на директорию, а не на файл.")
+        raise SystemExit(1)
+    except PermissionError:
+        print(f"Ошибка: у вас нет прав на запись в файл {args.output}.")
+        raise SystemExit(1)
+    except IOError as e:
+        print(f"Ошибка записи в файл {args.output}: {e}")
+        raise SystemExit(1)
