@@ -96,7 +96,7 @@ def get_args() -> argparse.Namespace:
     group.add_argument("-H","--hosts",help = "Введите имя хоста(ов), несколько адресов указывайте через запятую без пробелов",type=validate_hosts)
     group.add_argument("-F","--file",help="Путь к файлу со списком хостов (по одному в строке)",type=validate_file)
     #добавление аргументов 
-    parser.add_argument("-C","--count",help = "введите количество запросов",required=False,type=int,default=1)
+    parser.add_argument("-C","--count",help = "введите количество запросов",required=False,type=lambda x: int(x) if int(x) > 0 else  parser.error("Значение должно быть больше нуля"),default=1)
 
     parser.add_argument("-O","--output",help = "путь до файла куда нужно сохранить вывод",required=False)
     
