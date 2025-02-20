@@ -47,7 +47,7 @@
 ## Примеры работы программы
 ### 1.Применение флага -H
 запуск скрипта: 
-```python3 main.py -H https://yandex.ru,https://google.com```
+```python3 main.py -H https://yandex.ru,https://google.com```<br>
 резултат работы программы: 
 ```
 === Итоговая статистика по хостам ===
@@ -70,7 +70,7 @@ Host: https://google.com
 ```
 ### 2. Применение флагов -H, -С
 запуск скрипта: 
-```python3 main.py -H https://yandex.ru,https://google.com -C 5```
+```python3 main.py -H https://yandex.ru,https://google.com -C 5```<br>
 резултат работы программы: 
 ```
 === Итоговая статистика по хостам ===
@@ -99,7 +99,7 @@ https://nstu.ru
 https://amazon.com
 ```
 запуск скрипта: 
-```python3 main.py -F hosts.txt```
+```python3 main.py -F hosts.txt```<br>
 резултат работы программы: 
 ```
 === Итоговая статистика по хостам ===
@@ -137,9 +137,9 @@ https://nstu.ru
 https://amazon.com
 ```
 запуск скрипта: 
-```python3 main.py -F hosts.txt -C 5 -O output.txt```
+```python3 main.py -F hosts.txt -C 5 -O output.txt```<br>
 резултат работы программы(консоль): 
-```Результаты сохранены в файл: output.txt```
+```Результаты сохранены в файл: output.txt```<br>
 резултат работы программы(файл): 
 ``` 
 === Итоговая статистика по хостам ===
