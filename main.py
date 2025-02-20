@@ -247,7 +247,6 @@ if __name__=="__main__":
     args=get_args()
     #начало тестирования серверов
     results=start_requests(args.hosts if args.hosts else args.file, args.count) 
-    print(results)
     #вывод в консоль или в файл
     if not args.output:
         display_results(results)
