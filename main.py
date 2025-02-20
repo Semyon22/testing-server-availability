@@ -5,17 +5,18 @@ import asyncio
 import aiohttp
 
 
-# Регулярное выражение для проверки URL 
+# Регулярное выражение для проверки URL
 URL_PATTERN = re.compile(r"^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 results = {}
 
-def display_results(results:dict):
+
+def display_results(results: dict):
     """Выводит результаты тестирования веб-серверов на консоль
 
     Args:
         results (dict): Словарь с результатами проверки хостов. Ключи словаря — имена хостов,
                         значения — словари с метриками для каждого хоста
-    """        
+    """
     print("\n=== Итоговая статистика по хостам ===\n")
     for host, data in results.items():
         print(f"Host: {host}")
@@ -26,7 +27,8 @@ def display_results(results:dict):
         print(f"  Max: {data['Max']} ms")
         print(f"  Avg: {data['Avg']} ms\n")
 
-def save_to_file(output_path:str, results:dict):
+
+def save_to_file(output_path: str, results: dict):
     """Сохраняет результаты проверки хостов в текстовый файл.
 
     Args:
@@ -42,51 +44,81 @@ def save_to_file(output_path:str, results:dict):
                    - Нет прав на запись в файл (PermissionError).
                    - Ошибка ввода-вывода при записи файла (IOError).
                    - Файл не найден (FileNotFoundError).
-    """        
+    """
     try:
-            with open(output_path, 'w', encoding='utf-8') as file:
-                file.write("=== Итоговая статистика по хостам ===\n\n")
-                for host, data in results.items():
-                    file.write(f"Host: {host}\n")
-                    file.write(f"  Success: {data['Success']}\n")
-                    file.write(f"  Failed: {data['Failed']}\n")
-                    file.write(f"  Errors: {data['Errors']}\n")
-                    file.write(f"  Min: {data['Min']} ms\n")
-                    file.write(f"  Max: {data['Max']} ms\n")
-                    file.write(f"  Avg: {data['Avg']} ms\n\n")
-            print(f"Результаты сохранены в файл: {output_path}")
-        
+        with open(output_path, "w", encoding="utf-8") as file:
+            file.write("=== Итоговая статистика по хостам ===\n\n")
+            for host, data in results.items():
+                file.write(f"Host: {host}\n")
+                file.write(f"  Success: {data['Success']}\n")
+                file.write(f"  Failed: {data['Failed']}\n")
+                file.write(f"  Errors: {data['Errors']}\n")
+                file.write(f"  Min: {data['Min']} ms\n")
+                file.write(f"  Max: {data['Max']} ms\n")
+                file.write(f"  Avg: {data['Avg']} ms\n\n")
+        print(f"Результаты сохранены в файл: {output_path}")
+
     except FileNotFoundError:
-            print(f"Ошибка: файл {args.output} не найден.")
-            raise SystemExit(1)
+        print(f"Ошибка: файл {args.output} не найден.")
+        raise SystemExit(1)
     except IsADirectoryError:
-            print(f"Ошибка: путь {args.output} указывает на директорию, а не на файл.")
-            raise SystemExit(1)
+        print(
+            f"Ошибка: путь {
+                args.output} указывает на директорию, а не на файл."
+        )
+        raise SystemExit(1)
     except PermissionError:
-            print(f"Ошибка: у вас нет прав на запись в файл {args.output}.")
-            raise SystemExit(1)
+        print(f"Ошибка: у вас нет прав на запись в файл {args.output}.")
+        raise SystemExit(1)
     except IOError as e:
-            print(f"Ошибка записи в файл {args.output}: {e}")
-            raise SystemExit(1)   
-def get_args() -> argparse.Namespace: 
+        print(f"Ошибка записи в файл {args.output}: {e}")
+        raise SystemExit(1)
+
+
+def get_args() -> argparse.Namespace:
     """Парсит аргументы командой строки
 
     Returns:
         Namespace: Объект, содержащий аргументы командной строки.
-    """      
-    #создание парсера аргументов
+    """
+    # создание парсера аргументов
     parser = argparse.ArgumentParser()
-    #создание группы, где используется лишь один из параметров
+    # создание группы, где используется лишь один из параметров
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-H","--hosts",help = "Введите имя хоста(ов), несколько адресов указывайте через запятую без пробелов",type=validate_hosts)
-    group.add_argument("-F","--file",help="Путь к файлу со списком хостов (по одному в строке)",type=validate_file)
-    #добавление аргументов 
-    parser.add_argument("-C","--count",help = "введите количество запросов",required=False,type=lambda x: int(x) if int(x) > 0 else  parser.error("Значение должно быть больше нуля"),default=1)
+    group.add_argument(
+        "-H",
+        "--hosts",
+        help="Введите имя хоста(ов), несколько адресов указывайте через запятую без пробелов",
+        type=validate_hosts,
+    )
+    group.add_argument(
+        "-F",
+        "--file",
+        help="Путь к файлу со списком хостов (по одному в строке)",
+        type=validate_file,
+    )
+    # добавление аргументов
+    parser.add_argument(
+        "-C",
+        "--count",
+        help="введите количество запросов",
+        required=False,
+        type=lambda x: (
+            int(x) if int(x) > 0 else parser.error("Значение должно быть больше нуля")),
+        default=1,
+    )
 
-    parser.add_argument("-O","--output",help = "путь до файла куда нужно сохранить вывод",required=False)
-    
+    parser.add_argument(
+        "-O",
+        "--output",
+        help="путь до файла куда нужно сохранить вывод",
+        required=False,
+    )
+
     return parser.parse_args()
-def validate_hosts(hosts:str)->list:
+
+
+def validate_hosts(hosts: str) -> list:
     """Разделяет строку по запятым и проверяет каждый хост на соответствие формату URL
 
     Args:
@@ -97,19 +129,18 @@ def validate_hosts(hosts:str)->list:
 
     Returns:
         list: массив провалидированных URL
-    """    
-    
-    hosts = hosts.split(",")  
+    """
+
+    hosts = hosts.split(",")
     for host in hosts:
         if not URL_PATTERN.match(host):
             raise argparse.ArgumentTypeError(
-                f"Неверный формат адреса: {host}. Ожидается формат http://example.com или https://example.com"
-            )
-    
+                f"Неверный формат адреса: {host}. Ожидается формат http://example.com или https://example.com")
 
-    return hosts  
+    return hosts
 
-def validate_file(file_path:str)->list:
+
+def validate_file(file_path: str) -> list:
     """Проверяет и валидирует файл, содержащий список хостов (URL-адресов).
 
     Args:
@@ -128,10 +159,10 @@ def validate_file(file_path:str)->list:
                     - Один или несколько URL-адресов в файле имеют неверный формат.
     Returns:
         list: Список строк, где каждая строка представляет собой валидный URL-адрес
-    """    
+    """
     try:
-        with open(file_path,'r',encoding='utf-8') as file:
-            hosts=[host.strip() for host in file if host.strip()]
+        with open(file_path, "r", encoding="utf-8") as file:
+            hosts = [host.strip() for host in file if host.strip()]
         if not hosts:
             print(f"файл {file_path} пуст введите хотя бы один URL ")
             raise SystemExit(1)
@@ -147,7 +178,8 @@ def validate_file(file_path:str)->list:
         print(f"Файл {file_path} не найден.")
         raise SystemExit(1)
     except IsADirectoryError:
-        print(f"Ошибка: путь {file_path} указывает на директорию, а не на файл.")
+        print(
+            f"Ошибка: путь {file_path} указывает на директорию, а не на файл.")
         raise SystemExit(1)
     except PermissionError:
         print(f"Ошибка: у вас нет прав на чтение файла {file_path}.")
@@ -159,7 +191,8 @@ def validate_file(file_path:str)->list:
         print(f"Ошибка при чтении файла {file_path}: неверная кодировка.")
         raise SystemExit(1)
 
-async def start_request(host:str,count:int):
+
+async def start_request(host: str, count: int):
     """Выполняет асинхронные HTTP-запросы к указанному хосту и собирает статистику.
 
     Args:
@@ -175,14 +208,14 @@ async def start_request(host:str,count:int):
         - Обрабатывает возможные ошибки (таймауты, проблемы соединения и др.).
         - Сохраняет статистику (успехи, ошибки, минимальное, максимальное и среднее время отклика)
           в глобальном словаре `results`.
-    """      
+    """
     success_count, failed_count, error_count = 0, 0, 0
-    response_times=[]
+    response_times = []
     async with aiohttp.ClientSession() as session:
         for _ in range(count):
             try:
                 start_time = time.time()
-                #один запрос ушел, пока нет ответа выполняется следующий
+                # один запрос ушел, пока нет ответа выполняется следующий
                 response = await session.get(url=host)
                 elapsed_time = round((time.time() - start_time) * 1000, 2)
                 response_times.append(elapsed_time)
@@ -193,7 +226,8 @@ async def start_request(host:str,count:int):
                     failed_count += 1
             except aiohttp.ClientConnectionError:
                 error_count += 1
-                print(f"Ошибка: не удалось подключиться к {host}. Проверьте URL и интернет-соединение.")
+                print(
+                    f"Ошибка: не удалось подключиться к {host}. Проверьте URL и интернет-соединение.")
 
             except asyncio.TimeoutError:
                 error_count += 1
@@ -202,17 +236,22 @@ async def start_request(host:str,count:int):
             except aiohttp.ClientError as e:
                 error_count += 1
                 print(f"Ошибка при запросе к {host}: {e}")
-            
-    results[host] = {
-            "Success": success_count,
-            "Failed": failed_count,
-            "Errors": error_count,
-            "Min": min(response_times) if response_times else None,
-            "Max": max(response_times) if response_times else None,
-            "Avg": round(sum(response_times) / len(response_times), 2) if response_times else None
-    } 
 
-async def gather_data(hosts:list,count:int):
+    results[host] = {
+        "Success": success_count,
+        "Failed": failed_count,
+        "Errors": error_count,
+        "Min": min(response_times) if response_times else None,
+        "Max": max(response_times) if response_times else None,
+        "Avg": (
+            round(sum(response_times) / len(response_times), 2)
+            if response_times
+            else None
+        ),
+    }
+
+
+async def gather_data(hosts: list, count: int):
     """Запускает асинхронные задачи для выполнения запросов к нескольким хостам одновременно.
 
     Args:
@@ -221,26 +260,29 @@ async def gather_data(hosts:list,count:int):
 
     Description:
         - Для каждого хоста создает асинхронную задачу `start_request()`.
-        - Все задачи выполняются параллельно с помощью `asyncio.gather()`, 
+        - Все задачи выполняются параллельно с помощью `asyncio.gather()`,
           что позволяет эффективно обрабатывать множество запросов одновременно.
-    """    
+    """
     tasks = []
-    for host in hosts:            
-        task = asyncio.create_task(start_request(host,count))
+    for host in hosts:
+        task = asyncio.create_task(start_request(host, count))
         tasks.append(task)
     await asyncio.gather(*tasks)
-if __name__=="__main__":
-   
-    #получение списка параметров
-    args=get_args()
-    
+
+
+if __name__ == "__main__":
+
+    # получение списка параметров
+    args = get_args()
+
     print("идёт тестирование доступности серверов")
-    #начало тестирования серверов
-    asyncio.run(gather_data(args.hosts if args.hosts else args.file, args.count)) 
-    #вывод в консоль или в файл
+    # начало тестирования серверов
+    asyncio.run(
+        gather_data(
+            args.hosts if args.hosts else args.file,
+            args.count))
+    # вывод в консоль или в файл
     if not args.output:
         display_results(results)
     else:
-        save_to_file(args.output,results=results)
-    
-    
+        save_to_file(args.output, results=results)
